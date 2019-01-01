@@ -17,8 +17,8 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 	sha256secret := "3132333435363738393031323334353637383930" + "313233343536373839303132"
 	sha512secret := "3132333435363738393031323334353637383930" + "3132333435363738393031323334353637383930" + "3132333435363738393031323334353637383930" + "31323334"
 	builder := &Generator{
-		Digit:      8,
-		StepSecond: 30,
+		Digits:        8,
+		PeriodSeconds: 30,
 	}
 	type fields struct {
 		HMACHashAlgorithm string
@@ -154,8 +154,8 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 			o := &Generator{
 				HMACHashAlgorithm: tt.fields.HMACHashAlgorithm,
 				Secret:            hexDecode(tt.fields.Secret),
-				StepSecond:        builder.StepSecond,
-				Digit:             builder.Digit,
+				PeriodSeconds:     builder.PeriodSeconds,
+				Digits:            builder.Digits,
 			}
 			got, err := o.GenerateWithTime(tt.args.t)
 			if (err != nil) != tt.wantErr {
@@ -173,8 +173,8 @@ func TestGenerator_Generate(t *testing.T) {
 	type fields struct {
 		HMACHashAlgorithm string
 		Secret            string
-		StepSecond        int64
-		Digit             int
+		PeriodSeconds     int64
+		Digits            int
 	}
 	tests := []struct {
 		name    string
@@ -186,8 +186,8 @@ func TestGenerator_Generate(t *testing.T) {
 			fields: fields{
 				HMACHashAlgorithm: "sha1",
 				Secret:            "abcdef",
-				StepSecond:        30,
-				Digit:             6,
+				PeriodSeconds:     30,
+				Digits:            6,
 			},
 		},
 	}
@@ -196,8 +196,8 @@ func TestGenerator_Generate(t *testing.T) {
 			o := &Generator{
 				HMACHashAlgorithm: tt.fields.HMACHashAlgorithm,
 				Secret:            hexDecode(tt.fields.Secret),
-				StepSecond:        tt.fields.StepSecond,
-				Digit:             tt.fields.Digit,
+				PeriodSeconds:     tt.fields.PeriodSeconds,
+				Digits:            tt.fields.Digits,
 			}
 			got, err := o.Generate()
 			if (err != nil) != tt.wantErr {
