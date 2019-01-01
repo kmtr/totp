@@ -1,9 +1,15 @@
 package totp
 
 import (
+	"encoding/hex"
 	"testing"
 	"time"
 )
+
+func hexDecode(s string) []byte {
+	decoded, _ := hex.DecodeString(s)
+	return decoded
+}
 
 // https://tools.ietf.org/html/rfc6238
 func TestGenerator_GenerateWithTime(t *testing.T) {
@@ -15,8 +21,8 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 		StepSecond: 30,
 	}
 	type fields struct {
-		Algorithm string
-		SecretHex string
+		HMACHashAlgorithm string
+		Secret            string
 	}
 	type args struct {
 		t time.Time
@@ -29,7 +35,7 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "dummy algorithm error",
+			name:    "dummy HMACHashAlgorithm error",
 			fields:  fields{"dummy", sha1secret},
 			args:    args{time.Unix(1, 0)},
 			wantErr: true,
@@ -146,10 +152,10 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			o := &Generator{
-				Algorithm:  tt.fields.Algorithm,
-				SecretHex:  tt.fields.SecretHex,
-				StepSecond: builder.StepSecond,
-				Digit:      builder.Digit,
+				HMACHashAlgorithm: tt.fields.HMACHashAlgorithm,
+				Secret:            hexDecode(tt.fields.Secret),
+				StepSecond:        builder.StepSecond,
+				Digit:             builder.Digit,
 			}
 			got, err := o.GenerateWithTime(tt.args.t)
 			if (err != nil) != tt.wantErr {
@@ -165,10 +171,10 @@ func TestGenerator_GenerateWithTime(t *testing.T) {
 
 func TestGenerator_Generate(t *testing.T) {
 	type fields struct {
-		Algorithm  string
-		SecretHex  string
-		StepSecond int64
-		Digit      int
+		HMACHashAlgorithm string
+		Secret            string
+		StepSecond        int64
+		Digit             int
 	}
 	tests := []struct {
 		name    string
@@ -178,20 +184,20 @@ func TestGenerator_Generate(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				Algorithm:  "sha1",
-				SecretHex:  "abcdef",
-				StepSecond: 30,
-				Digit:      6,
+				HMACHashAlgorithm: "sha1",
+				Secret:            "abcdef",
+				StepSecond:        30,
+				Digit:             6,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			o := &Generator{
-				Algorithm:  tt.fields.Algorithm,
-				SecretHex:  tt.fields.SecretHex,
-				StepSecond: tt.fields.StepSecond,
-				Digit:      tt.fields.Digit,
+				HMACHashAlgorithm: tt.fields.HMACHashAlgorithm,
+				Secret:            hexDecode(tt.fields.Secret),
+				StepSecond:        tt.fields.StepSecond,
+				Digit:             tt.fields.Digit,
 			}
 			got, err := o.Generate()
 			if (err != nil) != tt.wantErr {

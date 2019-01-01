@@ -21,23 +21,20 @@ func makeBinary(hash []byte, digit int) int {
 }
 
 type Generator struct {
-	Algorithm  string
-	SecretHex  string
-	StepSecond int64
-	Digit      int
+	// HMACHashAlgorithm allows sha1, sha256, sha512
+	HMACHashAlgorithm string
+	Secret            []byte
+	StepSecond        int64
+	Digit             int
 }
 
 func (o *Generator) GenerateWithTime(timestamp time.Time) (string, error) {
 	t := fmt.Sprintf("%016x", timestamp.Unix()/o.StepSecond)
-	decodedSecret, err := hex.DecodeString(o.SecretHex)
-	if err != nil {
-		return "", ErrorDecodeSecret(err)
-	}
 	decodedTime, err := hex.DecodeString(t)
 	if err != nil {
 		return "", ErrorDecodeTimestamp(err)
 	}
-	code, err := makeHmac(o.Algorithm, decodedSecret, decodedTime)
+	code, err := makeHmac(o.HMACHashAlgorithm, o.Secret, decodedTime)
 	if err != nil {
 		return "", err
 	}
